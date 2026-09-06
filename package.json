@@ -30,7 +30,6 @@
   "scripts": {
     "build": "tsc",
     "typecheck": "tsc --noEmit",
-    "prepare": "tsc",
     "test": "node test/run.mjs"
   },
   "devDependencies": {
