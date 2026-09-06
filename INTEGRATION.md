@@ -1,7 +1,6 @@
 # Intégration de consent-kit
 
-Guide pour brancher consent-kit sur un site ou une app. Prévu pour être suivi par
-Claude Code ou à la main.
+Guide pour brancher consent-kit sur un site ou une app.
 
 Repo : `github:HiveHorizon/consent-kit`
 
