@@ -9,7 +9,7 @@ Repo: `github:HiveHorizon/consent-kit`
 ## 1. Install
 
 ```sh
-pnpm add github:HiveHorizon/consent-kit#v1.1.2
+pnpm add github:HiveHorizon/consent-kit#v1.1.3
 ```
 
 Pin a tag (`#v1.0.0`) so an update to the kit can never change a site's behaviour
@@ -44,6 +44,22 @@ Write the ids down as you go — they move into the config.
 ## 3. Write the config
 
 One file per project, so everything lives in one place.
+
+If the site has accounts, say so in the "strictly necessary" copy — people
+hesitate to refuse when they fear it will log them out:
+
+```ts
+ui: {
+  text: {
+    necessaryBody:
+      "Required for the site to work: keeping you signed in, and remembering " +
+      "the choice you make here. Refusing analytics affects neither.",
+  },
+}
+```
+
+Refusing never touches sign-in: the kit only decides which analytics scripts are
+injected, and never reads or writes the session.
 
 ### Marketing site
 

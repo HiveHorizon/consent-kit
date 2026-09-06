@@ -1,6 +1,6 @@
 {
   "name": "@hivehorizon/consent-kit",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "description": "Self-hosted, geo-aware cookie consent for sites and apps. No third-party CMP, no runtime service.",
   "license": "MIT",
   "repository": {

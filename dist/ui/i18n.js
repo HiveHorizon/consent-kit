@@ -8,7 +8,8 @@ export const fr = {
     save: "Enregistrer mes choix",
     privacyLink: "Politique de confidentialité",
     necessaryTitle: "Strictement nécessaires",
-    necessaryBody: "Indispensables au fonctionnement du site, notamment pour retenir votre choix ici.",
+    necessaryBody: "Indispensables au fonctionnement du site, notamment pour retenir votre choix " +
+        "ici. Refuser la mesure d'audience ne les désactive pas.",
     alwaysOn: "Toujours actifs",
     analyticsTitle: "Mesure d'audience",
     analyticsBody: "Pages consultées, parcours et blocages rencontrés. Nous aide à corriger ce qui " +
@@ -26,7 +27,8 @@ export const en = {
     save: "Save my choices",
     privacyLink: "Privacy policy",
     necessaryTitle: "Strictly necessary",
-    necessaryBody: "Required for the site to work, including remembering the choice you make here.",
+    necessaryBody: "Required for the site to work, including remembering the choice you make here. " +
+        "Refusing analytics does not disable them.",
     alwaysOn: "Always on",
     analyticsTitle: "Analytics",
     analyticsBody: "Pages viewed, journeys taken and where people get stuck. Helps us fix what is broken.",

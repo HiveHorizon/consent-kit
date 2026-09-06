@@ -12,7 +12,8 @@ export const fr: BannerText = {
   privacyLink: "Politique de confidentialité",
   necessaryTitle: "Strictement nécessaires",
   necessaryBody:
-    "Indispensables au fonctionnement du site, notamment pour retenir votre choix ici.",
+    "Indispensables au fonctionnement du site, notamment pour retenir votre choix " +
+    "ici. Refuser la mesure d'audience ne les désactive pas.",
   alwaysOn: "Toujours actifs",
   analyticsTitle: "Mesure d'audience",
   analyticsBody:
@@ -35,7 +36,8 @@ export const en: BannerText = {
   privacyLink: "Privacy policy",
   necessaryTitle: "Strictly necessary",
   necessaryBody:
-    "Required for the site to work, including remembering the choice you make here.",
+    "Required for the site to work, including remembering the choice you make here. " +
+    "Refusing analytics does not disable them.",
   alwaysOn: "Always on",
   analyticsTitle: "Analytics",
   analyticsBody:
