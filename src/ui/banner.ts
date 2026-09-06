@@ -112,7 +112,7 @@ export function createBanner(
     actions.append(refuse, accept);
 
     if (expanded) {
-      const save = el("button", "ck-btn", t.save);
+      const save = el("button", "ck-btn ck-btn--save", t.save);
       save.type = "button";
       save.addEventListener("click", () => {
         const choices: ConsentChoices = { analytics: false, marketing: false };

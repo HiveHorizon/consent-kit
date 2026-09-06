@@ -9,7 +9,7 @@ Repo: `github:HiveHorizon/consent-kit`
 ## 1. Install
 
 ```sh
-pnpm add github:HiveHorizon/consent-kit#v1.1.1
+pnpm add github:HiveHorizon/consent-kit#v1.1.2
 ```
 
 Pin a tag (`#v1.0.0`) so an update to the kit can never change a site's behaviour

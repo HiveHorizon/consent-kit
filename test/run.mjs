@@ -49,13 +49,18 @@ function installDom({ country = "FR", traceOk = true, path = "/", pageLang = nul
     click() { (this._listeners.click || []).forEach((f) => f()); },
     appendChild(kid) { this.children.push(kid); return kid; },
     append(...kids) { this.children.push(...kids); },
-    remove() {},
+    remove() {
+      if (this._parent) {
+        this._parent.children = this._parent.children.filter((c) => c !== this);
+        this._parent = null;
+      }
+    },
     focus() {},
     querySelector: () => null,
   });
 
   const head = { children: [], appendChild(el) { this.children.push(el); } };
-  const body = { children: [], appendChild(el) { this.children.push(el); return el; } };
+  const body = { children: [], appendChild(el) { el._parent = this; this.children.push(el); return el; } };
 
   globalThis.document = {
     head,
@@ -324,6 +329,20 @@ await test("a throwing vendor does not break the others", async () => {
   assert.equal(good.loaded, 1, "a failing vendor must not stop the rest");
 });
 
+function bannerButtons(dom) {
+  const root = dom.body.children.find((e) => (e.className || "").includes("ck-root"));
+  if (!root) return [];
+  const out = [];
+  const walk = (n) => {
+    for (const c of n.children || []) {
+      if (c.tagName === "BUTTON") out.push({ label: c.textContent, cls: c.className || "" });
+      walk(c);
+    }
+  };
+  walk(root);
+  return out;
+}
+
 function bannerButtonLabels(dom) {
   const root = dom.body.children.find((e) => (e.className || "").includes("ck-root"));
   if (!root) return [];
@@ -388,6 +407,30 @@ await test("debug mode is off by default", async () => {
   initConsent({ vendors: [spyVendor("ga4")], ui: false });
   await settle();
   assert.equal(globalThis.window.__consent, undefined, "must not leak onto window");
+});
+
+await test("save takes its own row so three buttons never squeeze", async () => {
+  const dom = installDom({ country: "FR", pageLang: "en" });
+  const api = initConsent({ vendors: [spyVendor("ga4")] });
+  await settle();
+  api.openSettings();
+
+  const buttons = bannerButtons(dom);
+  const save = buttons.find((b) => b.label === "Save my choices");
+  assert.ok(save, `save button missing, got ${buttons.map((b) => b.label).join(", ")}`);
+  assert.ok(
+    save.cls.includes("ck-btn--save"),
+    "save must carry the full-width modifier, or its label overflows the button",
+  );
+
+  // Refuse must not be visually weaker than accept while we are moving classes around.
+  const refuse = buttons.find((b) => b.label === "Refuse all");
+  const accept = buttons.find((b) => b.label === "Accept all");
+  assert.ok(refuse && accept, "both decisions must still be offered");
+  assert.ok(
+    refuse.cls.includes("ck-btn") && accept.cls.includes("ck-btn"),
+    "refuse and accept must share the same base button class",
+  );
 });
 
 // ----------------------------------------------------------------- report --

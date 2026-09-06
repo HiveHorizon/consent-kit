@@ -70,7 +70,7 @@ export function createBanner(opts, handlers, locale, enabledCategories) {
         accept.addEventListener("click", () => handlers.onAcceptAll());
         actions.append(refuse, accept);
         if (expanded) {
-            const save = el("button", "ck-btn", t.save);
+            const save = el("button", "ck-btn ck-btn--save", t.save);
             save.type = "button";
             save.addEventListener("click", () => {
                 const choices = { analytics: false, marketing: false };

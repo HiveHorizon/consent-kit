@@ -28,7 +28,7 @@ export const CSS = `
 .ck-root *,.ck-root *::before,.ck-root *::after{box-sizing:inherit}
 .ck-title{margin:0 0 3px;font-size:13.5px;font-weight:650;letter-spacing:-.01em}
 .ck-body{margin:0 0 11px;font-size:12.5px;color:var(--ck-muted)}
-.ck-actions{display:flex;gap:8px}
+.ck-actions{display:flex;gap:8px;flex-wrap:wrap}
 .ck-btn{
   flex:1 1 0; min-width:0; appearance:none; cursor:pointer; white-space:nowrap;
   font:inherit; font-size:13px; font-weight:600; padding:8px 10px;
@@ -38,6 +38,9 @@ export const CSS = `
 .ck-btn:hover{filter:brightness(1.18)}
 .ck-btn:focus-visible{outline:2px solid var(--ck-accent);outline-offset:2px}
 .ck-btn--primary{background:var(--ck-accent);border-color:var(--ck-accent);color:var(--ck-accent-fg)}
+/* Save takes its own full-width row: three buttons do not fit across the card,
+   and in the expanded panel saving a selection is the action being asked for. */
+.ck-btn--save{flex:1 0 100%}
 /* Secondary row: keeps "customise" and the policy link off the button row so the
    card stays two lines tall in its collapsed state. */
 .ck-foot{display:flex;flex-wrap:wrap;align-items:center;gap:4px 14px;margin-top:10px}
