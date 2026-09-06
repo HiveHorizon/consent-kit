@@ -1,44 +1,43 @@
 # consent-kit
 
-Bannière de consentement cookies, auto-hébergée, partagée entre tous mes sites et
-apps. Pas de prestataire tiers, pas de service à héberger, aucune dépendance à
-l'exécution.
+Self-hosted cookie consent, shared across sites and apps. No third-party CMP, no
+service to run, no runtime dependencies.
 
-**→ [INTEGRATION.md](./INTEGRATION.md) pour brancher le kit sur un projet.**
+**→ [INTEGRATION.md](./INTEGRATION.md) to wire it into a project.**
 
-## Ce que ça fait
+## What it does
 
 ```
-                          Visiteur
+                          Visitor
                              │
               ┌──────────────┴──────────────┐
-              │   choix déjà enregistré ?   │
+              │   choice already stored?    │
               └──────────────┬──────────────┘
-                   oui │              │ non
-                       │              │
-              on applique      pays via /cdn-cgi/trace
-                                      │
-                       ┌──────────────┴──────────────┐
-                  Europe / inconnu              reste du monde
-                       │                              │
-                  bannière                    tout démarre,
-              rien n'est chargé              aucune bannière
-                       │
-              ┌────────┴────────┐
-          Accepter          Refuser
-              │                 │
-        GA4 + Clarity      rien, jamais
+                    yes │           │ no
+                        │           │
+                    apply it   country via /cdn-cgi/trace
+                                     │
+                      ┌──────────────┴──────────────┐
+                 Europe / unknown             rest of world
+                        │                            │
+                     banner                 everything starts,
+                nothing is loaded                no banner
+                        │
+              ┌─────────┴─────────┐
+           Accept              Refuse
+              │                   │
+        GA4 + Clarity        nothing, ever
 ```
 
-Le pays vient de `/cdn-cgi/trace`, servi par toute zone proxifiée par Cloudflare :
-même origine, pas de clé, pas de cookie, rien envoyé à un tiers. Si l'appel
-échoue — bloqueur, réseau, domaine non proxifié — la bannière s'affiche. **En cas
-de doute, on protège.**
+The country comes from `/cdn-cgi/trace`, served by any Cloudflare-proxied zone:
+same-origin, no key, no cookie, nothing sent to a third party. If the lookup fails
+— ad blocker, network, zone not proxied — the banner is shown. **When in doubt,
+protect.**
 
-En Europe, tant que la personne n'a pas accepté, aucun `<script>` vendeur n'est
-inséré dans la page. Pas « chargé mais en veille » : absent.
+Inside a consent region, no vendor `<script>` is inserted into the page until the
+visitor accepts. Not "loaded but paused": absent.
 
-## Utilisation
+## Usage
 
 ```sh
 pnpm add github:HiveHorizon/consent-kit#v1.0.0
@@ -49,8 +48,7 @@ import { initConsent, ga4, clarity } from "@hivehorizon/consent-kit";
 
 initConsent({
   policyVersion: "2026-09",
-  locale: "fr",
-  ui: { privacyUrl: "/confidentialite" },
+  ui: { privacyUrl: "/privacy" },
   vendors: [
     ga4("G-XXXXXXXXXX"),
     clarity("xxxxxxxxxx", { exclude: ["/search", "/admin"] }),
@@ -58,50 +56,54 @@ initConsent({
 });
 ```
 
-Pour une app derrière un login, `profile: "app"` floute l'écran vis-à-vis du
-session replay et enregistre le choix sur le compte plutôt que dans le navigateur.
-Détails dans [INTEGRATION.md](./INTEGRATION.md).
+For an app behind a login, `profile: "app"` masks the screen from session replay
+and stores the choice on the user's account rather than in the browser. See
+[INTEGRATION.md](./INTEGRATION.md).
 
-## Choix de conception
+## Design decisions
 
-**Pas de Worker Cloudflare.** Une requête même-origine vers `/cdn-cgi/trace` suffit
-et évite de faire varier le cache par pays, ou de mettre du code entre chaque
-visiteur et chaque page.
+**No Cloudflare Worker.** A same-origin request to `/cdn-cgi/trace` is enough, and
+it avoids having to vary the cache by country or put code between every visitor
+and every page.
 
-**Pas de « consent mode avancé ».** Le mode avancé de Google charge quand même
-gtag.js et envoie des pings avant tout accord. Ici le script n'existe pas tant que
-l'accord n'est pas donné : plus simple à expliquer, plus simple à défendre.
+**No Google "advanced consent mode".** Advanced mode still loads gtag.js and sends
+pings before any agreement. Here the script does not exist until consent is given:
+simpler to explain, simpler to defend.
 
-**Pas de serveur de consentement.** Un cookie propriétaire suffit pour un site.
-Pour une app, le choix va dans la ligne utilisateur de sa propre base — pas dans
-un service séparé de plus à maintenir.
+**No consent server.** A first-party cookie is enough for a site. For an app the
+choice goes in the user's own row of the app's existing database — not in yet
+another service to maintain.
 
-**Repli fermé.** Toute incertitude sur le pays mène à la bannière.
+**Fail closed.** Any uncertainty about the country leads to the banner.
 
-## Conformité
+## Compliance
 
-Le kit implémente les règles que la CNIL sanctionne le plus :
+The kit implements the rules regulators actually fine for:
 
-- « Tout refuser » de même taille et même poids visuel que « Tout accepter »
-- pas de croix de fermeture — fermer n'est pas consentir
-- cases décochées par défaut
-- refus mémorisé aussi longtemps qu'une acceptation (180 jours par défaut)
-- `openConsentSettings()` pour changer d'avis à tout moment
+- "Refuse all" the same size and visual weight as "Accept all"
+- no dismiss cross — closing is not consenting
+- nothing pre-ticked
+- refusals remembered as long as acceptances (180 days by default)
+- `openConsentSettings()` so anyone can change their mind at any time
 
-Ce sont des choix techniques, pas un avis juridique. Reste à ta charge : la
-politique de confidentialité, et l'arbitrage sur les outils que tu déclares.
+These are engineering choices, not legal advice. Still yours: the privacy policy,
+and the judgement call on which tools you run.
 
-## Développement
+## Localisation
+
+The banner ships with English and French copy and picks one from the browser
+language. Override it with `locale`, or replace any string through `ui.text`.
+
+## Development
 
 ```sh
 pnpm install
-pnpm test        # 16 tests de comportement, sans navigateur
+pnpm test        # 16 behavioural tests, no browser needed
 pnpm build
 pnpm typecheck
 ```
 
-Toute modification de la logique de décision doit être couverte par un test dans
-`test/run.mjs`.
+Any change to the decision logic must be covered by a test in `test/run.mjs`.
 
 ## Licence
 

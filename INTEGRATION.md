@@ -1,51 +1,51 @@
-# Intégration de consent-kit
+# Integrating consent-kit
 
-Guide pour brancher consent-kit sur un site ou une app.
+How to wire consent-kit into a site or an app.
 
-Repo : `github:HiveHorizon/consent-kit`
+Repo: `github:HiveHorizon/consent-kit`
 
 ---
 
-## 1. Installer
+## 1. Install
 
 ```sh
 pnpm add github:HiveHorizon/consent-kit#v1.0.0
 ```
 
-Épingler une version (`#v1.0.0`) évite qu'une mise à jour du kit change le
-comportement d'un site sans qu'on l'ait décidé. Pour mettre à jour : bump le tag,
-`pnpm install`, vérifier, commit.
+Pin a tag (`#v1.0.0`) so an update to the kit can never change a site's behaviour
+without someone deciding it. To upgrade: bump the tag, `pnpm install`, verify,
+commit.
 
-Aucune dépendance à l'exécution. Le paquet se compile tout seul à l'installation.
+No runtime dependencies, and no build step at install time.
 
 ---
 
-## 2. Retirer les scripts existants
+## 2. Remove the existing scripts
 
-**C'est l'étape la plus importante et la plus facile à rater.** Tant qu'un
-`<script>` GA4 / GTM / Clarity reste dans le `<head>`, il se charge avant tout
-consentement et le kit ne sert à rien.
+**This is the most important step and the easiest one to get wrong.** As long as a
+GA4 / GTM / Clarity `<script>` sits in `<head>`, it loads before any consent and
+the kit achieves nothing.
 
-Chercher et supprimer dans les layouts / `index.html` :
+Find and delete, in layouts and `index.html`:
 
-- `googletagmanager.com/gtm.js` et le `<noscript>` GTM associé
+- `googletagmanager.com/gtm.js` and its `<noscript>` twin in `<body>`
 - `googletagmanager.com/gtag/js`
-- le bloc `window.dataLayer = ... gtag('config', ...)`
+- the `window.dataLayer = ... gtag('config', ...)` block
 - `clarity.ms/tag/`
-- tout autre pixel (Meta, LinkedIn, Hotjar…)
+- any other pixel (Meta, LinkedIn, Hotjar…)
 
-Noter les identifiants au passage : ils repartent dans la config.
+Write the ids down as you go — they move into the config.
 
-À **garder** : les analytics auto-hébergés et sans cookie (Umami, Plausible).
-Ils se déclarent en `cookieless()` et continuent de tourner pour tout le monde.
+**Keep** self-hosted, cookieless analytics (Umami, Plausible). Declare them with
+`cookieless()` and they keep running for everyone.
 
 ---
 
-## 3. Créer la config
+## 3. Write the config
 
-Un seul fichier par projet, pour que tout soit au même endroit.
+One file per project, so everything lives in one place.
 
-### Site vitrine
+### Marketing site
 
 `src/lib/consent.ts`
 
@@ -56,18 +56,17 @@ export function setupConsent() {
   return initConsent({
     profile: "site",
     policyVersion: "2026-09",
-    cookieDomain: ".exemple.com", // si vitrine + app partagent le domaine
-    locale: "fr",
-    ui: { privacyUrl: "/confidentialite" },
+    cookieDomain: ".example.com", // when the site and the app share a root domain
+    ui: { privacyUrl: "/privacy" },
     vendors: [
       ga4("G-XXXXXXXXXX"),
-      clarity("xxxxxxxxxx", { exclude: ["/recherche", "/admin"] }),
+      clarity("xxxxxxxxxx", { exclude: ["/search", "/admin"] }),
     ],
   });
 }
 ```
 
-### Web-app (derrière une connexion)
+### Web app (behind a login)
 
 ```ts
 import { initConsent, ga4, clarity, accountStorage } from "@hivehorizon/consent-kit";
@@ -75,18 +74,17 @@ import { api } from "./api";
 
 export function setupConsent() {
   return initConsent({
-    profile: "app",       // floute l'app pour le replay + suit les changements de route
+    profile: "app",       // masks the app for replay + tracks client-side routes
     appRoot: "#app",
     policyVersion: "2026-09",
-    cookieDomain: ".exemple.com",
-    locale: "fr",
-    ui: { privacyUrl: "https://exemple.com/confidentialite" },
+    cookieDomain: ".example.com",
+    ui: { privacyUrl: "https://example.com/privacy" },
 
-    // Le choix suit la personne d'un appareil à l'autre
+    // The choice follows the person across devices
     storage: accountStorage({
       load: () => api.get("/me/consent"),
       save: (record) => api.put("/me/consent", record),
-      cookie: { domain: ".exemple.com" },
+      cookie: { domain: ".example.com" },
     }),
 
     vendors: [
@@ -97,16 +95,16 @@ export function setupConsent() {
 }
 ```
 
-Pour `accountStorage`, côté serveur : un champ JSON sur la ligne utilisateur
-(`consent`), plus deux routes `GET`/`PUT`. Pas de table ni de service dédié.
-Quand les deux copies existent, la plus récente gagne — sans ça, se connecter sur
-un second appareil écraserait un choix plus récent.
+For `accountStorage`, the server side is a JSON column on the user row
+(`consent`) plus a `GET` and a `PUT`. No dedicated table, no dedicated service.
+When both copies exist the newer one wins — without that, signing in on a second
+device would overwrite a more recent choice.
 
 ---
 
-## 4. Appeler au démarrage
+## 4. Call it on startup
 
-**Astro** — dans `BaseLayout.astro`, avant `</body>` :
+**Astro** — in `BaseLayout.astro`, before `</body>`:
 
 ```astro
 <script>
@@ -115,20 +113,20 @@ un second appareil écraserait un choix plus récent.
 </script>
 ```
 
-**Vue / React SPA** — dans `main.ts`, après le montage :
+**Vue / React SPA** — in `main.ts`, after mounting:
 
 ```ts
 app.mount("#app");
 setupConsent();
 ```
 
-L'ordre compte pour une app : `maskRoot` a besoin que `#app` existe déjà.
+Order matters for an app: `maskRoot` needs `#app` to exist already.
 
 ---
 
-## 5. Lien « Cookies » dans le pied de page
+## 5. Footer "Cookies" link
 
-Obligatoire : il faut pouvoir changer d'avis à tout moment.
+Required: people must be able to change their mind at any time.
 
 ```html
 <button type="button" id="cookie-settings">Cookies</button>
@@ -141,85 +139,85 @@ Obligatoire : il faut pouvoir changer d'avis à tout moment.
 
 ---
 
-## 6. Vérifier
+## 6. Verify
 
-Le test qui compte, c'est le comportement réseau. Onglet Réseau des devtools :
+The test that counts is network behaviour, not whether the banner looks right.
+Open devtools, Network tab:
 
-| Situation | Attendu |
+| Situation | Expected |
 | --- | --- |
-| Depuis la France, sans avoir choisi | Bannière visible. **Aucune** requête vers `googletagmanager.com` ni `clarity.ms`. |
-| Clic « Tout refuser » | Bannière disparaît. Toujours aucune requête. Rechargement : pas de bannière, pas de requête. |
-| Clic « Tout accepter » | Requêtes GA4 / Clarity qui partent. Rechargement : elles repartent, sans bannière. |
-| Depuis les États-Unis (VPN) | Pas de bannière. Requêtes immédiates. |
-| Sur une page `exclude` | Le vendor listé ne se charge pas, les autres si. |
+| From France, no choice made | Banner visible. **Zero** requests to `googletagmanager.com` or `clarity.ms`. |
+| Click "Refuse all" | Banner goes. Still zero requests. Reload: no banner, no requests. |
+| Click "Accept all" | GA4 / Clarity requests fire. Reload: they fire again, no banner. |
+| From the US (VPN) | No banner. Requests fire immediately. |
+| On an `exclude`d path | The listed vendor does not load, the others do. |
 
-Forcer un pays sans VPN, en dev :
+Force a country without a VPN, in development:
 
 ```ts
 import { staticGeo } from "@hivehorizon/consent-kit";
 initConsent({ geo: staticGeo("FR"), debug: true, /* … */ });
 ```
 
-`debug: true` explique chaque décision dans la console.
+`debug: true` explains every decision in the console.
 
-Repartir de zéro : supprimer le cookie `consent_prefs`, ou en console
-`__consentKit.reset()` si tu l'exposes.
-
----
-
-## 7. Politique de confidentialité
-
-À citer nommément : Google Analytics 4 (Google Ireland/LLC) et Microsoft Clarity
-(Microsoft Corp.), ce qu'ils collectent, la durée de conservation, et comment
-retirer son consentement (le lien du point 5).
-
-Bumper `policyVersion` à chaque ajout d'outil : tout le monde est réinterrogé.
+Start over: delete the `consent_prefs` cookie.
 
 ---
 
-## Référence des options
+## 7. Privacy policy
 
-| Option | Défaut | Rôle |
+Name the tools explicitly: Google Analytics 4 (Google Ireland / LLC) and Microsoft
+Clarity (Microsoft Corp.), what they collect, how long it is kept, and how to
+withdraw consent (the link from step 5).
+
+Bump `policyVersion` whenever you add a tool: everyone is asked again.
+
+---
+
+## Options reference
+
+| Option | Default | Purpose |
 | --- | --- | --- |
-| `vendors` | — | Ce qui peut être chargé. |
-| `regions` | `"eu"` | `"eu"`, `"all"`, ou une liste de codes pays. |
-| `policyVersion` | `"1"` | Bump = tout le monde est réinterrogé. |
-| `expiryDays` | `180` | Durée de mémorisation. La CNIL recommande 6 mois max. |
-| `cookieDomain` | — | `".exemple.com"` pour partager entre sous-domaines. |
-| `storage` | cookie | `accountStorage()` pour les apps avec comptes. |
-| `geo` | Cloudflare | `staticGeo("FR")` en dev. |
-| `profile` | `"site"` | `"app"` = floutage replay + suivi des routes. |
-| `appRoot` | `"#app"` | Élément flouté en profil `"app"`. |
-| `ui` | bannière | `false` pour piloter l'affichage toi-même. |
-| `locale` | navigateur | `"fr"` ou `"en"`. |
-| `onChange` | — | Rappelé à chaque état de consentement résolu. |
-| `debug` | `false` | Trace les décisions en console. |
+| `vendors` | — | Everything that may be loaded. |
+| `regions` | `"eu"` | `"eu"`, `"all"`, or an explicit country list. |
+| `policyVersion` | `"1"` | Bump it and everyone is asked again. |
+| `expiryDays` | `180` | How long a choice is remembered. Regulators suggest 6 months or less. |
+| `cookieDomain` | — | `".example.com"` to share across subdomains. |
+| `storage` | cookie | `accountStorage()` for apps with accounts. |
+| `geo` | Cloudflare | `staticGeo("FR")` in development. |
+| `profile` | `"site"` | `"app"` = replay masking + route tracking. |
+| `appRoot` | `"#app"` | Element masked under profile `"app"`. |
+| `ui` | banner | `false` to drive the UI yourself. |
+| `locale` | browser | `"fr"` or `"en"`. |
+| `onChange` | — | Called on every resolved consent state. |
+| `debug` | `false` | Logs decisions to the console. |
 
 ### Vendors
 
-| Fonction | Usage |
+| Function | Use |
 | --- | --- |
 | `ga4(id, { exclude, config })` | Google Analytics 4. |
-| `gtm(id, { exclude })` | Google Tag Manager. Soit `gtm`, soit `ga4`, pas les deux. |
+| `gtm(id, { exclude })` | Google Tag Manager. Either `gtm` or `ga4`, not both. |
 | `clarity(id, { exclude, maskRoot })` | Microsoft Clarity. |
-| `cookieless({ id, src, attrs })` | Umami / Plausible. Chargé pour tout le monde. |
-| `custom({ id, category, load })` | Tout le reste. |
+| `cookieless({ id, src, attrs })` | Umami / Plausible. Loads for everyone. |
+| `custom({ id, category, load })` | Anything else. |
 
 ---
 
-## Pièges
+## Pitfalls
 
-**Clarity et les URL.** Clarity enregistre l'URL telle quelle et le masquage de
-paramètre n'est pas en libre-service chez Microsoft. Si une valeur sensible passe
-en `?param=` (un domaine cherché, un email), mettre la page dans `exclude`.
+**Clarity and URLs.** Clarity records the page URL verbatim, and masking a URL
+parameter is not self-serve at Microsoft. If a sensitive value ends up in
+`?param=` (a searched domain, an email), put the path in `exclude`.
 
-**`exclude` ne marche pas en SPA.** Une fois Clarity chargé, il continue
-d'enregistrer au changement de route côté client. Dans une app : ne jamais mettre
-de valeur sensible dans l'URL, et compter sur `maskRoot`, pas sur `exclude`.
+**`exclude` does not work in a SPA.** Once Clarity is loaded it keeps recording
+across client-side navigation. In an app: never put a sensitive value in the URL,
+and rely on `maskRoot` rather than `exclude`.
 
-**Ne pas maquiller la bannière.** « Tout refuser » doit rester aussi visible que
-« Tout accepter » — c'est l'erreur la plus sanctionnée par la CNIL. Les CSS
-variables permettent de reskinner sans toucher à cet équilibre.
+**Do not restyle the banner into something unfair.** "Refuse all" must stay as
+prominent as "Accept all" — this is the single most fined mistake. The CSS
+variables let you reskin without touching that balance.
 
-**Ne jamais identifier avec un email.** `clarity("identify", …)` ou
-`gtag('set', {user_id})` : passer un identifiant opaque, jamais une adresse.
+**Never identify anyone by email.** `clarity("identify", …)` or
+`gtag('set', {user_id})`: pass an opaque id, never an address.
