@@ -134,11 +134,11 @@ export function createBanner(
     // Secondary row, so the collapsed card stays compact: the two decisions keep
     // the button row to themselves.
     const foot = el("div", "ck-foot");
-    // Only worth offering when there is something to arbitrate. With a single
-    // category, customising lands on exactly what the two buttons already do,
-    // so it is one more click for the same outcome.
-    if (!expanded && rows.length > 1) {
-      const more = el("button", "ck-link", t.customise);
+    // With one category the panel arbitrates nothing — but it is still the only
+    // place saying what is being accepted, which is the reason to open it. So
+    // the link stays and is named after what it does.
+    if (!expanded && rows.length > 0) {
+      const more = el("button", "ck-link", rows.length > 1 ? t.customise : t.details);
       more.type = "button";
       more.addEventListener("click", () => {
         expanded = true;

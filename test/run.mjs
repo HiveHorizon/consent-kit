@@ -553,7 +553,7 @@ await test("saving an untouched reopened panel keeps consent granted", async () 
   );
 });
 
-await test("customise is hidden when there is only one category to decide", async () => {
+await test("one category offers an explanation, not a fake choice", async () => {
   const dom = installDom({ country: "FR", pageLang: "en" });
   initConsent({ vendors: [spyVendor("ga4", { category: "analytics" })] });
   await settle();
@@ -561,7 +561,11 @@ await test("customise is hidden when there is only one category to decide", asyn
   assert.ok(labels.includes("Refuse all") && labels.includes("Accept all"));
   assert.ok(
     !labels.includes("Customise"),
-    "one category means customising repeats the two buttons",
+    "with nothing to arbitrate, calling it customise promises a choice it does not offer",
+  );
+  assert.ok(
+    labels.includes("What this covers"),
+    "the panel explains what is being accepted, so the way in must remain",
   );
 });
 
