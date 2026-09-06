@@ -1,8 +1,7 @@
 export const fr = {
     title: "Cookies et mesure d'audience",
-    body: "Nous utilisons des outils de mesure pour comprendre comment le site est utilisé " +
-        "et l'améliorer. Rien n'est activé sans votre accord, et vous pouvez changer d'avis " +
-        "à tout moment.",
+    body: "Des outils de mesure nous aident à améliorer le site. Rien n'est activé sans " +
+        "votre accord.",
     acceptAll: "Tout accepter",
     refuseAll: "Tout refuser",
     customise: "Personnaliser",
@@ -20,8 +19,7 @@ export const fr = {
 };
 export const en = {
     title: "Cookies and analytics",
-    body: "We use analytics to understand how this site is used and improve it. Nothing is " +
-        "enabled without your agreement, and you can change your mind at any time.",
+    body: "Analytics help us improve this site. Nothing is enabled without your agreement.",
     acceptAll: "Accept all",
     refuseAll: "Refuse all",
     customise: "Customise",
@@ -38,9 +36,14 @@ export const en = {
 export function pickLocale(explicit) {
     if (explicit)
         return explicit === "fr" ? fr : en;
-    if (typeof navigator !== "undefined" && navigator.language?.toLowerCase().startsWith("fr")) {
-        return fr;
-    }
-    return en;
+    // The page's own language wins over the browser's. A French-speaking visitor
+    // on an English-only site should read the banner in the site's language —
+    // reading navigator.language first shows French copy on an English page.
+    const pageLang = typeof document !== "undefined"
+        ? document.documentElement?.getAttribute("lang")
+        : null;
+    const browserLang = typeof navigator !== "undefined" ? navigator.language : null;
+    const lang = (pageLang || browserLang || "").toLowerCase();
+    return lang.startsWith("fr") ? fr : en;
 }
 //# sourceMappingURL=i18n.js.map

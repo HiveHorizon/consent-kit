@@ -40,7 +40,7 @@ visitor accepts. Not "loaded but paused": absent.
 ## Usage
 
 ```sh
-pnpm add github:HiveHorizon/consent-kit#v1.0.0
+pnpm add github:HiveHorizon/consent-kit#v1.1.0
 ```
 
 ```ts
@@ -91,8 +91,10 @@ and the judgement call on which tools you run.
 
 ## Localisation
 
-The banner ships with English and French copy and picks one from the browser
-language. Override it with `locale`, or replace any string through `ui.text`.
+The banner ships with English and French copy. It follows the page's own
+`<html lang>` first and only falls back to the browser language, so a
+French-speaking visitor on an English-only site still reads English. Override it
+with `locale`, or replace any string through `ui.text`.
 
 ## Development
 

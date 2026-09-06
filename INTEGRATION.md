@@ -9,7 +9,7 @@ Repo: `github:HiveHorizon/consent-kit`
 ## 1. Install
 
 ```sh
-pnpm add github:HiveHorizon/consent-kit#v1.0.0
+pnpm add github:HiveHorizon/consent-kit#v1.1.0
 ```
 
 Pin a tag (`#v1.0.0`) so an update to the kit can never change a site's behaviour
@@ -189,7 +189,7 @@ Bump `policyVersion` whenever you add a tool: everyone is asked again.
 | `profile` | `"site"` | `"app"` = replay masking + route tracking. |
 | `appRoot` | `"#app"` | Element masked under profile `"app"`. |
 | `ui` | banner | `false` to drive the UI yourself. |
-| `locale` | browser | `"fr"` or `"en"`. |
+| `locale` | `<html lang>`, then browser | `"fr"` or `"en"`. |
 | `onChange` | — | Called on every resolved consent state. |
 | `debug` | `false` | Logs decisions to the console. |
 

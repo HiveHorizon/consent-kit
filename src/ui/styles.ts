@@ -14,60 +14,63 @@
 export const CSS = `
 .ck-root{
   --ck-bg:#14141a; --ck-fg:#f2f1f4; --ck-muted:#a8a6b3; --ck-border:#2a2a33;
-  --ck-accent:#5b5ef0; --ck-accent-fg:#fff; --ck-btn-bg:#23232c; --ck-radius:14px;
-  --ck-max:min(560px, calc(100vw - 32px)); --ck-shadow:0 16px 48px rgba(0,0,0,.42);
+  --ck-accent:#5b5ef0; --ck-accent-fg:#fff; --ck-btn-bg:#23232c; --ck-radius:12px;
+  --ck-max:min(360px, calc(100vw - 24px)); --ck-shadow:0 12px 32px rgba(0,0,0,.4);
   position:fixed; z-index:2147483000; left:16px; bottom:16px; width:var(--ck-max);
   font-family:system-ui,-apple-system,"Segoe UI",sans-serif; color:var(--ck-fg);
   background:var(--ck-bg); border:1px solid var(--ck-border);
   border-radius:var(--ck-radius); box-shadow:var(--ck-shadow);
-  padding:20px; box-sizing:border-box; line-height:1.5;
-  animation:ck-in .22s ease-out;
+  padding:14px 16px; box-sizing:border-box; line-height:1.45;
+  animation:ck-in .2s ease-out;
 }
 @media (prefers-reduced-motion:reduce){ .ck-root{animation:none} }
-@keyframes ck-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes ck-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 .ck-root *,.ck-root *::before,.ck-root *::after{box-sizing:inherit}
-.ck-title{margin:0 0 6px;font-size:15px;font-weight:650;letter-spacing:-.01em}
-.ck-body{margin:0 0 14px;font-size:13.5px;color:var(--ck-muted)}
-.ck-actions{display:flex;gap:8px;flex-wrap:wrap}
+.ck-title{margin:0 0 3px;font-size:13.5px;font-weight:650;letter-spacing:-.01em}
+.ck-body{margin:0 0 11px;font-size:12.5px;color:var(--ck-muted)}
+.ck-actions{display:flex;gap:8px}
 .ck-btn{
-  flex:1 1 auto; min-width:132px; appearance:none; cursor:pointer;
-  font:inherit; font-size:13.5px; font-weight:600; padding:10px 16px;
-  border-radius:9px; border:1px solid var(--ck-border); background:var(--ck-btn-bg);
-  color:var(--ck-fg); transition:filter .15s ease, background .15s ease;
+  flex:1 1 0; min-width:0; appearance:none; cursor:pointer; white-space:nowrap;
+  font:inherit; font-size:13px; font-weight:600; padding:8px 10px;
+  border-radius:8px; border:1px solid var(--ck-border); background:var(--ck-btn-bg);
+  color:var(--ck-fg); transition:filter .15s ease;
 }
 .ck-btn:hover{filter:brightness(1.18)}
 .ck-btn:focus-visible{outline:2px solid var(--ck-accent);outline-offset:2px}
 .ck-btn--primary{background:var(--ck-accent);border-color:var(--ck-accent);color:var(--ck-accent-fg)}
-.ck-btn--link{
-  flex:0 0 100%; min-width:0; background:none; border:none; color:var(--ck-muted);
-  text-decoration:underline; font-weight:500; padding:6px 0; text-align:left;
+/* Secondary row: keeps "customise" and the policy link off the button row so the
+   card stays two lines tall in its collapsed state. */
+.ck-foot{display:flex;flex-wrap:wrap;align-items:center;gap:4px 14px;margin-top:10px}
+.ck-link{
+  appearance:none;background:none;border:none;padding:0;cursor:pointer;
+  font:inherit;font-size:12px;color:var(--ck-muted);text-decoration:underline;
 }
-.ck-privacy{display:inline-block;margin-top:10px;font-size:12.5px;color:var(--ck-muted)}
-.ck-panel{margin:4px 0 14px;display:flex;flex-direction:column;gap:10px}
+.ck-link:hover{color:var(--ck-fg)}
+.ck-link:focus-visible{outline:2px solid var(--ck-accent);outline-offset:2px;border-radius:3px}
+.ck-panel{margin:2px 0 11px;display:flex;flex-direction:column;gap:7px}
 .ck-cat{
-  display:flex;gap:12px;align-items:flex-start;padding:12px;
-  border:1px solid var(--ck-border);border-radius:10px;background:rgba(255,255,255,.02);
+  display:flex;gap:10px;align-items:flex-start;padding:9px 10px;
+  border:1px solid var(--ck-border);border-radius:9px;background:rgba(255,255,255,.02);
 }
 .ck-cat-txt{flex:1;min-width:0}
-.ck-cat-title{font-size:13.5px;font-weight:600;margin:0 0 2px}
-.ck-cat-body{font-size:12.5px;color:var(--ck-muted);margin:0}
-.ck-always{font-size:12px;color:var(--ck-muted);white-space:nowrap;padding-top:2px}
-.ck-switch{position:relative;flex:0 0 auto;width:42px;height:24px;margin-top:1px}
+.ck-cat-title{font-size:12.5px;font-weight:600;margin:0 0 1px}
+.ck-cat-body{font-size:11.5px;color:var(--ck-muted);margin:0}
+.ck-always{font-size:11px;color:var(--ck-muted);white-space:nowrap;padding-top:1px}
+.ck-switch{position:relative;flex:0 0 auto;width:36px;height:21px;margin-top:1px}
 .ck-switch input{position:absolute;opacity:0;width:100%;height:100%;margin:0;cursor:pointer}
 .ck-track{
   position:absolute;inset:0;border-radius:999px;background:var(--ck-btn-bg);
   border:1px solid var(--ck-border);transition:background .18s ease;pointer-events:none;
 }
 .ck-track::after{
-  content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;
+  content:"";position:absolute;top:3px;left:3px;width:13px;height:13px;border-radius:50%;
   background:var(--ck-muted);transition:transform .18s ease,background .18s ease;
 }
 .ck-switch input:checked + .ck-track{background:var(--ck-accent);border-color:var(--ck-accent)}
-.ck-switch input:checked + .ck-track::after{transform:translateX(18px);background:#fff}
+.ck-switch input:checked + .ck-track::after{transform:translateX(15px);background:#fff}
 .ck-switch input:focus-visible + .ck-track{outline:2px solid var(--ck-accent);outline-offset:2px}
-@media (max-width:520px){
-  .ck-root{left:8px;right:8px;bottom:8px;width:auto;padding:16px}
-  .ck-btn{flex:1 1 100%}
+@media (max-width:480px){
+  .ck-root{left:8px;right:8px;bottom:8px;width:auto}
 }
 `;
 

@@ -24,10 +24,13 @@ async function test(name, fn) {
 
 // ---------------------------------------------------------------- DOM stub --
 
-function installDom({ country = "FR", traceOk = true, path = "/" } = {}) {
+function installDom({ country = "FR", traceOk = true, path = "/", pageLang = null, browserLang = "en-GB" } = {}) {
   const cookies = new Map();
 
-  const makeEl = () => ({
+  const makeEl = (tag) => ({
+    tagName: String(tag).toUpperCase(),
+    className: "",
+    textContent: "",
     id: "",
     async: false,
     defer: false,
@@ -40,19 +43,24 @@ function installDom({ country = "FR", traceOk = true, path = "/" } = {}) {
     getAttribute(k) {
       return this._attrs[k] ?? null;
     },
-    appendChild() {},
-    append() {},
+    children: [],
+    _listeners: {},
+    addEventListener(ev, fn) { (this._listeners[ev] ||= []).push(fn); },
+    click() { (this._listeners.click || []).forEach((f) => f()); },
+    appendChild(kid) { this.children.push(kid); return kid; },
+    append(...kids) { this.children.push(...kids); },
     remove() {},
     focus() {},
     querySelector: () => null,
   });
 
   const head = { children: [], appendChild(el) { this.children.push(el); } };
-  const body = { appendChild() {} };
+  const body = { children: [], appendChild(el) { this.children.push(el); return el; } };
 
   globalThis.document = {
     head,
     body,
+    documentElement: { getAttribute: (k) => (k === "lang" ? pageLang : null) },
     activeElement: null,
     createElement: makeEl,
     getElementById(id) {
@@ -76,7 +84,7 @@ function installDom({ country = "FR", traceOk = true, path = "/" } = {}) {
   globalThis.window = { document: globalThis.document, location: globalThis.location };
   // Node exposes navigator as a getter-only global, so redefine it.
   Object.defineProperty(globalThis, "navigator", {
-    value: { language: "en-GB" },
+    value: { language: browserLang },
     configurable: true,
     writable: true,
   });
@@ -91,9 +99,13 @@ function installDom({ country = "FR", traceOk = true, path = "/" } = {}) {
     throw new Error(`unexpected fetch: ${url}`);
   };
 
+  // Always defined in a browser; the banner uses it when closing.
+  globalThis.HTMLElement = class HTMLElement {};
+
   return {
     cookies,
     head,
+    body,
     traceCalls: () => traceCalls,
   };
 }
@@ -310,6 +322,55 @@ await test("a throwing vendor does not break the others", async () => {
   await settle();
   console.error = origError;
   assert.equal(good.loaded, 1, "a failing vendor must not stop the rest");
+});
+
+function bannerButtonLabels(dom) {
+  const root = dom.body.children.find((e) => (e.className || "").includes("ck-root"));
+  if (!root) return [];
+  const out = [];
+  const walk = (n) => {
+    for (const c of n.children || []) {
+      if (c.tagName === "BUTTON" && c.textContent) out.push(c.textContent);
+      walk(c);
+    }
+  };
+  walk(root);
+  return out;
+}
+
+await test("banner follows the page language, not the browser's", async () => {
+  // An English-only site read by a French-speaking visitor must stay English.
+  const dom = installDom({ country: "FR", pageLang: "en", browserLang: "fr-FR" });
+  initConsent({ vendors: [spyVendor("ga4")] });
+  await settle();
+  const labels = bannerButtonLabels(dom);
+  assert.ok(labels.includes("Refuse all"), `expected English copy, got ${labels.join(", ")}`);
+});
+
+await test("a French page gets French copy", async () => {
+  const dom = installDom({ country: "FR", pageLang: "fr", browserLang: "en-GB" });
+  initConsent({ vendors: [spyVendor("ga4")] });
+  await settle();
+  const labels = bannerButtonLabels(dom);
+  assert.ok(labels.includes("Tout refuser"), `expected French copy, got ${labels.join(", ")}`);
+});
+
+await test("an explicit locale overrides the page language", async () => {
+  const dom = installDom({ country: "FR", pageLang: "en", browserLang: "en-GB" });
+  initConsent({ vendors: [spyVendor("ga4")], locale: "fr" });
+  await settle();
+  assert.ok(bannerButtonLabels(dom).includes("Tout refuser"));
+});
+
+await test("refuse is offered before accept", async () => {
+  const dom = installDom({ country: "FR", pageLang: "en" });
+  initConsent({ vendors: [spyVendor("ga4")] });
+  await settle();
+  const labels = bannerButtonLabels(dom);
+  assert.ok(
+    labels.indexOf("Refuse all") < labels.indexOf("Accept all"),
+    "refusing must never be the harder path",
+  );
 });
 
 // ----------------------------------------------------------------- report --

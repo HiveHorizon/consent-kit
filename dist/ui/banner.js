@@ -80,21 +80,26 @@ export function createBanner(opts, handlers, locale, enabledCategories) {
             });
             actions.append(save);
         }
-        else if (rows.length > 0) {
-            const more = el("button", "ck-btn ck-btn--link", t.customise);
+        root.append(actions);
+        // Secondary row, so the collapsed card stays compact: the two decisions keep
+        // the button row to themselves.
+        const foot = el("div", "ck-foot");
+        if (!expanded && rows.length > 0) {
+            const more = el("button", "ck-link", t.customise);
             more.type = "button";
             more.addEventListener("click", () => {
                 expanded = true;
                 render();
             });
-            actions.append(more);
+            foot.append(more);
         }
-        root.append(actions);
         if (opts.privacyUrl) {
-            const link = el("a", "ck-privacy", t.privacyLink);
+            const link = el("a", "ck-link", t.privacyLink);
             link.href = opts.privacyUrl;
-            root.append(link);
+            foot.append(link);
         }
+        if (foot.children.length > 0)
+            root.append(foot);
         document.body.appendChild(root);
         root.querySelector("button")?.focus({ preventScroll: true });
     }
