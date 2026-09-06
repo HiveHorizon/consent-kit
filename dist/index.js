@@ -159,7 +159,7 @@ export function initConsent(config) {
                 onAcceptAll: () => decide({ ...ALL }, false),
                 onRefuseAll: () => decide({ ...NONE }, false),
                 onSave: (choices) => decide(choices, false),
-            }, config.locale, categories);
+            }, config.locale, categories, () => record?.choices ?? null);
         }
         return banner;
     }

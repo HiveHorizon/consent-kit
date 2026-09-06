@@ -40,6 +40,12 @@ export function createBanner(
   handlers: BannerHandlers,
   locale: "fr" | "en" | undefined,
   enabledCategories: Set<keyof ConsentChoices>,
+  /**
+   * Current choices, or null when nothing has been decided yet. Reopening the
+   * panel must show what is actually stored: leaving the toggles off would both
+   * look like the choice was lost and, on save, silently revoke it.
+   */
+  getChoices: () => ConsentChoices | null = () => null,
 ): BannerHandle {
   const t: BannerText = { ...pickLocale(locale), ...opts.text };
   if (opts.styles !== false) injectStyles();
@@ -61,7 +67,8 @@ export function createBanner(
     const label = el("label", "ck-switch");
     const input = el("input");
     input.type = "checkbox";
-    input.checked = false; // never pre-ticked
+    // Never pre-ticked on a first request; reflects the stored choice after one.
+    input.checked = getChoices()?.[row.key] ?? false;
     input.setAttribute("aria-label", row.title);
     const track = el("span", "ck-track");
     label.append(input, track);

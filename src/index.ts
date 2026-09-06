@@ -194,6 +194,7 @@ export function initConsent(config: ConsentConfig): ConsentApi {
         },
         config.locale,
         categories,
+        () => record?.choices ?? null,
       );
     }
     return banner;

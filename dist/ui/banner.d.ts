@@ -12,4 +12,10 @@ export interface BannerHandle {
     close(): void;
     destroy(): void;
 }
-export declare function createBanner(opts: BannerOptions, handlers: BannerHandlers, locale: "fr" | "en" | undefined, enabledCategories: Set<keyof ConsentChoices>): BannerHandle;
+export declare function createBanner(opts: BannerOptions, handlers: BannerHandlers, locale: "fr" | "en" | undefined, enabledCategories: Set<keyof ConsentChoices>, 
+/**
+ * Current choices, or null when nothing has been decided yet. Reopening the
+ * panel must show what is actually stored: leaving the toggles off would both
+ * look like the choice was lost and, on save, silently revoke it.
+ */
+getChoices?: () => ConsentChoices | null): BannerHandle;

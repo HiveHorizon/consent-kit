@@ -330,13 +330,28 @@ await test("a throwing vendor does not break the others", async () => {
   assert.equal(good.loaded, 1, "a failing vendor must not stop the rest");
 });
 
+function bannerToggles(dom) {
+  const roots = dom.body.children.filter((e) => (e.className || "").includes("ck-root"));
+  const root = roots[roots.length - 1];
+  if (!root) return [];
+  const out = [];
+  const walk = (n) => {
+    for (const c of n.children || []) {
+      if (c.tagName === "INPUT") out.push({ label: c._attrs?.["aria-label"], checked: c.checked });
+      walk(c);
+    }
+  };
+  walk(root);
+  return out;
+}
+
 function bannerButtons(dom) {
   const root = dom.body.children.find((e) => (e.className || "").includes("ck-root"));
   if (!root) return [];
   const out = [];
   const walk = (n) => {
     for (const c of n.children || []) {
-      if (c.tagName === "BUTTON") out.push({ label: c.textContent, cls: c.className || "" });
+      if (c.tagName === "BUTTON") out.push({ label: c.textContent, cls: c.className || "", el: c });
       walk(c);
     }
   };
@@ -479,6 +494,63 @@ await test("the audit stays silent outside debug", async () => {
   await settle();
   console.warn = origWarn;
   assert.equal(warnings.length, 0, "production must not log advice");
+});
+
+await test("a first visitor sees nothing pre-ticked", async () => {
+  const dom = installDom({ country: "FR", pageLang: "en" });
+  const api = initConsent({ vendors: [spyVendor("ga4")] });
+  await settle();
+  api.openSettings();
+  const toggles = bannerToggles(dom);
+  assert.ok(toggles.length > 0, "expected a category toggle");
+  assert.ok(toggles.every((t) => t.checked === false), "nothing may be pre-ticked");
+});
+
+await test("reopening after accept shows the categories as granted", async () => {
+  const dom = installDom({ country: "FR", pageLang: "en" });
+  const api = initConsent({ vendors: [spyVendor("ga4")] });
+  await settle();
+  api.acceptAll();
+  api.openSettings();
+
+  const analytics = bannerToggles(dom).find((t) => t.label === "Analytics");
+  assert.ok(analytics, "analytics toggle missing");
+  assert.equal(
+    analytics.checked,
+    true,
+    "an accepted category must read as on, or saving without touching it revokes consent",
+  );
+});
+
+await test("reopening after refuse shows the categories as denied", async () => {
+  const dom = installDom({ country: "FR", pageLang: "en" });
+  const api = initConsent({ vendors: [spyVendor("ga4")] });
+  await settle();
+  api.refuseAll();
+  api.openSettings();
+  const analytics = bannerToggles(dom).find((t) => t.label === "Analytics");
+  assert.equal(analytics?.checked, false);
+});
+
+await test("saving an untouched reopened panel keeps consent granted", async () => {
+  const dom = installDom({ country: "FR", pageLang: "en" });
+  const vendor = spyVendor("ga4");
+  const api = initConsent({ vendors: [vendor] });
+  await settle();
+  api.acceptAll();
+  assert.equal(vendor.loaded, 1);
+
+  api.openSettings();
+  const buttons = bannerButtons(dom);
+  const save = buttons.find((b) => b.label === "Save my choices");
+  assert.ok(save, "save button missing");
+  save.el.click();
+
+  assert.equal(
+    api.get().choices.analytics,
+    true,
+    "saving without touching anything must not silently revoke consent",
+  );
 });
 
 // ----------------------------------------------------------------- report --
