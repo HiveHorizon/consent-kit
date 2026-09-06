@@ -4,6 +4,7 @@ Self-hosted cookie consent, shared across sites and apps. No third-party CMP, no
 service to run, no runtime dependencies.
 
 **→ [INTEGRATION.md](./INTEGRATION.md) to wire it into a project.**
+**→ [LEGAL-PAGES.md](./LEGAL-PAGES.md) for the pages the banner promises.**
 
 ## What it does
 
@@ -40,7 +41,7 @@ visitor accepts. Not "loaded but paused": absent.
 ## Usage
 
 ```sh
-pnpm add github:HiveHorizon/consent-kit#v1.1.3
+pnpm add github:HiveHorizon/consent-kit#v1.2.0
 ```
 
 ```ts

@@ -101,7 +101,8 @@ function installDom({ country = "FR", traceOk = true, path = "/", pageLang = nul
       if (!traceOk) throw new Error("blocked");
       return { ok: true, text: async () => `fl=abc\nloc=${country}\nvisit_scheme=https` };
     }
-    throw new Error(`unexpected fetch: ${url}`);
+    // anything else (the legal-page audit) behaves like a missing route
+    return { ok: false, status: 404, text: async () => "" };
   };
 
   // Always defined in a browser; the banner uses it when closing.
@@ -431,6 +432,53 @@ await test("save takes its own row so three buttons never squeeze", async () => 
     refuse.cls.includes("ck-btn") && accept.cls.includes("ck-btn"),
     "refuse and accept must share the same base button class",
   );
+});
+
+await test("debug warns when the banner promises a policy page that is missing", async () => {
+  const dom = installDom({ country: "FR", pageLang: "en" });
+  const warnings = [];
+  const origWarn = console.warn, origInfo = console.info;
+  console.warn = (m) => warnings.push(String(m));
+  console.info = () => {};
+  // /privacy is not among the stubbed routes, so the HEAD request fails
+  dom.routes = {};
+  initConsent({
+    vendors: [spyVendor("ga4")],
+    ui: { privacyUrl: "/privacy" },
+    debug: true,
+  });
+  await settle();
+  console.warn = origWarn; console.info = origInfo;
+  assert.ok(
+    warnings.some((w) => w.includes("/privacy")),
+    `expected a warning about /privacy, got: ${warnings.join(" | ") || "none"}`,
+  );
+});
+
+await test("debug warns when no privacy url is configured at all", async () => {
+  installDom({ country: "FR", pageLang: "en" });
+  const warnings = [];
+  const origWarn = console.warn, origInfo = console.info;
+  console.warn = (m) => warnings.push(String(m));
+  console.info = () => {};
+  initConsent({ vendors: [spyVendor("ga4")], debug: true });
+  await settle();
+  console.warn = origWarn; console.info = origInfo;
+  assert.ok(
+    warnings.some((w) => w.includes("privacyUrl")),
+    `expected a warning about the missing policy link, got: ${warnings.join(" | ") || "none"}`,
+  );
+});
+
+await test("the audit stays silent outside debug", async () => {
+  installDom({ country: "FR", pageLang: "en" });
+  const warnings = [];
+  const origWarn = console.warn;
+  console.warn = (m) => warnings.push(String(m));
+  initConsent({ vendors: [spyVendor("ga4")], ui: { privacyUrl: "/privacy" } });
+  await settle();
+  console.warn = origWarn;
+  assert.equal(warnings.length, 0, "production must not log advice");
 });
 
 // ----------------------------------------------------------------- report --

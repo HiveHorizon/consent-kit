@@ -21,6 +21,48 @@ export function openConsentSettings() {
 export function getConsent() {
     return current?.get() ?? null;
 }
+/**
+ * Debug-only sanity check on the pages the banner promises.
+ *
+ * A banner that links to a missing privacy policy is worse than no banner: it
+ * states a commitment the site cannot show. This is easy to miss because the
+ * link looks fine until someone clicks it, so it is checked out loud rather
+ * than left to a reviewer.
+ */
+async function auditLegalPages(config) {
+    const warn = (msg) => console.warn(`[consent-kit] ${msg}`);
+    const privacyUrl = config.ui === false ? undefined : config.ui?.privacyUrl;
+    if (!privacyUrl) {
+        warn("no ui.privacyUrl set, so the banner shows no policy link. Publish a " +
+            "privacy policy naming every vendor below and point to it. " +
+            "See LEGAL-PAGES.md.");
+    }
+    else {
+        await expectPage(privacyUrl, "ui.privacyUrl", warn);
+    }
+    // A control has to exist on every page, not only where a footer happens to
+    // be — checkout and auth layouts are the ones that usually lack it.
+    if (config.ui !== false &&
+        typeof document !== "undefined" &&
+        !document.querySelector("[data-cookie-settings], #cookie-settings")) {
+        warn("no element on this page reopens the preferences. Consent must stay " +
+            "withdrawable everywhere: add a control calling openConsentSettings(), " +
+            "and check pages whose layout has no footer.");
+    }
+}
+async function expectPage(url, label, warn) {
+    // Only same-origin paths can be checked without leaking a request elsewhere.
+    if (!url.startsWith("/"))
+        return;
+    try {
+        const res = await fetch(url, { method: "HEAD", cache: "no-store" });
+        if (!res.ok)
+            warn(`${label} points at ${url}, which returns ${res.status}.`);
+    }
+    catch {
+        warn(`${label} points at ${url}, which could not be reached.`);
+    }
+}
 export function initConsent(config) {
     if (typeof window === "undefined") {
         // SSR / build time: hand back an inert API rather than throwing.
@@ -143,6 +185,7 @@ export function initConsent(config) {
     if (debug) {
         window.__consent = api;
         log("debug on — use __consent.reset() to clear the stored choice");
+        void auditLegalPages(config);
     }
     // Exempt vendors start straight away — no consent, no geo lookup, no wait.
     loadVendors({ analytics: true, marketing: true }, exempt);

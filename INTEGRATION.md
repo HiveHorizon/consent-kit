@@ -9,7 +9,7 @@ Repo: `github:HiveHorizon/consent-kit`
 ## 1. Install
 
 ```sh
-pnpm add github:HiveHorizon/consent-kit#v1.1.3
+pnpm add github:HiveHorizon/consent-kit#v1.2.0
 ```
 
 Pin a tag (`#v1.0.0`) so an update to the kit can never change a site's behaviour
@@ -153,9 +153,40 @@ Required: people must be able to change their mind at any time.
 </script>
 ```
 
+Bind it once in the layout every page passes through, rather than inside the
+footer component — otherwise each new placement needs its own script, and any
+layout without a footer silently ends up with no control at all:
+
+```ts
+document.querySelectorAll("[data-cookie-settings]").forEach((el) => {
+  el.addEventListener("click", openConsentSettings);
+});
+```
+
 ---
 
-## 6. Verify
+## 6. Check the pages the banner promises
+
+The banner links to a privacy policy and claims nothing loads without consent.
+Both have to be true and visible, or the banner is worse than none.
+
+- **Privacy policy** — must exist and name every vendor declared in the config.
+- **Legal notice** — required for any French professional site, and separate
+  from the privacy policy.
+- **Terms** — reachable before a purchase.
+- **The Cookies control** — present in *every layout*, not every page. Checkout
+  and sign-in layouts are the ones that lack a footer.
+
+**[LEGAL-PAGES.md](./LEGAL-PAGES.md)** has the checklist, the copy blocks that
+match what the kit actually does, and a shell audit for an existing site.
+
+With `debug: true` the kit checks part of this out loud, and warns when the
+policy link is missing, returns a non-200, or when the page has no control to
+reopen the preferences.
+
+---
+
+## 7. Verify
 
 The test that counts is network behaviour, not whether the banner looks right.
 Open devtools, Network tab:
@@ -190,13 +221,12 @@ banner without a reload.
 
 ---
 
-## 7. Privacy policy
+## 8. Keep it current
 
-Name the tools explicitly: Google Analytics 4 (Google Ireland / LLC) and Microsoft
-Clarity (Microsoft Corp.), what they collect, how long it is kept, and how to
-withdraw consent (the link from step 5).
-
-Bump `policyVersion` whenever you add a tool: everyone is asked again.
+Bump `policyVersion` and revise the policy pages whenever a vendor is added or
+removed, a vendor starts collecting something new, retention changes, or the
+operating entity changes. Bumping re-asks everyone — which is the point, since
+consent was given against a description that has now changed.
 
 ---
 
