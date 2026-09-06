@@ -9,7 +9,7 @@ Repo: `github:HiveHorizon/consent-kit`
 ## 1. Install
 
 ```sh
-pnpm add github:HiveHorizon/consent-kit#v1.1.0
+pnpm add github:HiveHorizon/consent-kit#v1.1.1
 ```
 
 Pin a tag (`#v1.0.0`) so an update to the kit can never change a site's behaviour
@@ -161,7 +161,16 @@ initConsent({ geo: staticGeo("FR"), debug: true, /* … */ });
 
 `debug: true` explains every decision in the console.
 
-Start over: delete the `consent_prefs` cookie.
+Start over. A stored choice suppresses the banner on purpose, so after one click
+it will not come back until you clear it:
+
+```js
+// in the browser console
+document.cookie = "consent_prefs=; path=/; max-age=0"; location.reload();
+```
+
+With `debug: true` the API is also on `window`, so `__consent.reset()` reopens the
+banner without a reload.
 
 ---
 

@@ -373,6 +373,23 @@ await test("refuse is offered before accept", async () => {
   );
 });
 
+await test("debug mode exposes the api for resetting a stored choice", async () => {
+  installDom({ country: "FR", pageLang: "en" });
+  const origInfo = console.info;
+  console.info = () => {};
+  const api = initConsent({ vendors: [spyVendor("ga4")], ui: false, debug: true });
+  await settle();
+  console.info = origInfo;
+  assert.equal(globalThis.window.__consent, api, "__consent should be the live api");
+});
+
+await test("debug mode is off by default", async () => {
+  installDom({ country: "FR", pageLang: "en" });
+  initConsent({ vendors: [spyVendor("ga4")], ui: false });
+  await settle();
+  assert.equal(globalThis.window.__consent, undefined, "must not leak onto window");
+});
+
 // ----------------------------------------------------------------- report --
 
 let failed = 0;

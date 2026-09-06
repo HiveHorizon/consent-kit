@@ -164,6 +164,14 @@ export function initConsent(config: ConsentConfig): ConsentApi {
   };
   current = api;
 
+  // A stored choice legitimately suppresses the banner, which makes testing
+  // confusing: after one click it never comes back. Under debug, expose the API
+  // so `__consent.reset()` in the console brings it back.
+  if (debug) {
+    (window as unknown as Record<string, unknown>).__consent = api;
+    log("debug on — use __consent.reset() to clear the stored choice");
+  }
+
   // Exempt vendors start straight away — no consent, no geo lookup, no wait.
   loadVendors({ analytics: true, marketing: true }, exempt);
 
