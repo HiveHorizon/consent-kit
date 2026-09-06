@@ -41,11 +41,11 @@ inséré dans la page. Pas « chargé mais en veille » : absent.
 ## Utilisation
 
 ```sh
-pnpm add github:arnauddsj/consent-kit#v1.0.0
+pnpm add github:HiveHorizon/consent-kit#v1.0.0
 ```
 
 ```ts
-import { initConsent, ga4, clarity } from "consent-kit";
+import { initConsent, ga4, clarity } from "@hivehorizon/consent-kit";
 
 initConsent({
   policyVersion: "2026-09",

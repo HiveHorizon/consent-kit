@@ -3,14 +3,14 @@
 Guide pour brancher consent-kit sur un site ou une app. Prévu pour être suivi par
 Claude Code ou à la main.
 
-Repo : `github:arnauddsj/consent-kit`
+Repo : `github:HiveHorizon/consent-kit`
 
 ---
 
 ## 1. Installer
 
 ```sh
-pnpm add github:arnauddsj/consent-kit#v1.0.0
+pnpm add github:HiveHorizon/consent-kit#v1.0.0
 ```
 
 Épingler une version (`#v1.0.0`) évite qu'une mise à jour du kit change le
@@ -51,7 +51,7 @@ Un seul fichier par projet, pour que tout soit au même endroit.
 `src/lib/consent.ts`
 
 ```ts
-import { initConsent, ga4, clarity } from "consent-kit";
+import { initConsent, ga4, clarity } from "@hivehorizon/consent-kit";
 
 export function setupConsent() {
   return initConsent({
@@ -71,7 +71,7 @@ export function setupConsent() {
 ### Web-app (derrière une connexion)
 
 ```ts
-import { initConsent, ga4, clarity, accountStorage } from "consent-kit";
+import { initConsent, ga4, clarity, accountStorage } from "@hivehorizon/consent-kit";
 import { api } from "./api";
 
 export function setupConsent() {
@@ -134,7 +134,7 @@ Obligatoire : il faut pouvoir changer d'avis à tout moment.
 ```html
 <button type="button" id="cookie-settings">Cookies</button>
 <script>
-  import { openConsentSettings } from "consent-kit";
+  import { openConsentSettings } from "@hivehorizon/consent-kit";
   document.getElementById("cookie-settings")
     ?.addEventListener("click", openConsentSettings);
 </script>
@@ -157,7 +157,7 @@ Le test qui compte, c'est le comportement réseau. Onglet Réseau des devtools :
 Forcer un pays sans VPN, en dev :
 
 ```ts
-import { staticGeo } from "consent-kit";
+import { staticGeo } from "@hivehorizon/consent-kit";
 initConsent({ geo: staticGeo("FR"), debug: true, /* … */ });
 ```
 

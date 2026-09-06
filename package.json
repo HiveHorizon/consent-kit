@@ -1,12 +1,12 @@
 {
-  "name": "consent-kit",
+  "name": "@hivehorizon/consent-kit",
   "version": "1.0.0",
   "description": "Self-hosted, geo-aware cookie consent for Arnaud's sites and apps. No third party, no runtime service.",
   "license": "MIT",
   "author": "Arnaud DE SAINT JEAN",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/arnauddsj/consent-kit.git"
+    "url": "git+https://github.com/HiveHorizon/consent-kit.git"
   },
   "type": "module",
   "main": "./dist/index.js",
