@@ -107,4 +107,23 @@ Any change to the decision logic must be covered by a test in `test/run.mjs`.
 
 ## Licence
 
-MIT
+MIT — see [LICENSE](./LICENSE).
+
+## Disclaimer
+
+This software is provided "as is", without warranty of any kind, express or
+implied. The authors and copyright holders accept no liability for any claim,
+damage, loss, penalty or other liability arising from the use of this software,
+whether in contract, tort or otherwise.
+
+**This is an engineering tool, not legal advice, and it does not make a site
+compliant on its own.** Whether your use of analytics is lawful depends on how
+you configure the kit, which tools you actually run, what your privacy policy
+says, and the rules that apply where your visitors are — none of which this
+software can determine for you.
+
+Anyone deploying it is solely responsible for their own compliance, and for
+verifying that the behaviour matches what their site tells visitors. Verify it in
+the Network tab before relying on it (see
+[INTEGRATION.md](./INTEGRATION.md#6-verify)). If compliance matters to your
+business, get it reviewed by a qualified professional.

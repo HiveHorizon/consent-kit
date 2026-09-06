@@ -221,3 +221,16 @@ variables let you reskin without touching that balance.
 
 **Never identify anyone by email.** `clarity("identify", …)` or
 `gtag('set', {user_id})`: pass an opaque id, never an address.
+
+---
+
+## Disclaimer
+
+This kit is an engineering tool, not legal advice, and installing it does not by
+itself make a site compliant. Whether your setup is lawful depends on your
+configuration, the tools you run, your privacy policy and the rules that apply
+where your visitors are.
+
+Always confirm the actual behaviour in the Network tab (step 6) before relying on
+it. The software is provided "as is", with no warranty and no liability — see
+[LICENSE](./LICENSE).
