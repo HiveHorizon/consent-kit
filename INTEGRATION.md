@@ -9,7 +9,7 @@ Repo: `github:HiveHorizon/consent-kit`
 ## 1. Install
 
 ```sh
-pnpm add github:HiveHorizon/consent-kit#v1.2.1
+pnpm add github:HiveHorizon/consent-kit#v1.2.2
 ```
 
 Pin a tag (`#v1.0.0`) so an update to the kit can never change a site's behaviour
@@ -244,6 +244,10 @@ consent was given against a description that has now changed.
 | `profile` | `"site"` | `"app"` = replay masking + route tracking. |
 | `appRoot` | `"#app"` | Element masked under profile `"app"`. |
 | `ui` | banner | `false` to drive the UI yourself. |
+
+The banner adapts to what you declare: with a single consent category the
+"customise" link is hidden, because refusing and accepting already express the
+whole choice. Declare a `marketing` vendor and it appears.
 | `locale` | `<html lang>`, then browser | `"fr"` or `"en"`. |
 | `onChange` | — | Called on every resolved consent state. |
 | `debug` | `false` | Logs decisions to the console. |

@@ -553,6 +553,44 @@ await test("saving an untouched reopened panel keeps consent granted", async () 
   );
 });
 
+await test("customise is hidden when there is only one category to decide", async () => {
+  const dom = installDom({ country: "FR", pageLang: "en" });
+  initConsent({ vendors: [spyVendor("ga4", { category: "analytics" })] });
+  await settle();
+  const labels = bannerButtons(dom).map((b) => b.label);
+  assert.ok(labels.includes("Refuse all") && labels.includes("Accept all"));
+  assert.ok(
+    !labels.includes("Customise"),
+    "one category means customising repeats the two buttons",
+  );
+});
+
+await test("customise appears once there is a real trade-off", async () => {
+  const dom = installDom({ country: "FR", pageLang: "en" });
+  initConsent({
+    vendors: [
+      spyVendor("ga4", { category: "analytics" }),
+      spyVendor("pixel", { category: "marketing" }),
+    ],
+  });
+  await settle();
+  assert.ok(
+    bannerButtons(dom).map((b) => b.label).includes("Customise"),
+    "two categories must still be separable",
+  );
+});
+
+await test("the footer link still opens the panel with one category", async () => {
+  const dom = installDom({ country: "FR", pageLang: "en" });
+  const api = initConsent({ vendors: [spyVendor("ga4")] });
+  await settle();
+  api.acceptAll();
+  api.openSettings();
+  // Reaching state through the footer must stay possible even without the link.
+  const analytics = bannerToggles(dom).find((t) => t.label === "Analytics");
+  assert.equal(analytics?.checked, true, "the panel must still show current state");
+});
+
 // ----------------------------------------------------------------- report --
 
 let failed = 0;

@@ -41,7 +41,7 @@ visitor accepts. Not "loaded but paused": absent.
 ## Usage
 
 ```sh
-pnpm add github:HiveHorizon/consent-kit#v1.2.1
+pnpm add github:HiveHorizon/consent-kit#v1.2.2
 ```
 
 ```ts

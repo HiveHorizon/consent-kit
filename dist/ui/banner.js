@@ -91,7 +91,10 @@ getChoices = () => null) {
         // Secondary row, so the collapsed card stays compact: the two decisions keep
         // the button row to themselves.
         const foot = el("div", "ck-foot");
-        if (!expanded && rows.length > 0) {
+        // Only worth offering when there is something to arbitrate. With a single
+        // category, customising lands on exactly what the two buttons already do,
+        // so it is one more click for the same outcome.
+        if (!expanded && rows.length > 1) {
             const more = el("button", "ck-link", t.customise);
             more.type = "button";
             more.addEventListener("click", () => {
