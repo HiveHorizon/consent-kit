@@ -561,11 +561,12 @@ await test("one category offers an explanation, not a fake choice", async () => 
   assert.ok(labels.includes("Refuse all") && labels.includes("Accept all"));
   assert.ok(
     !labels.includes("Customise"),
-    "with nothing to arbitrate, calling it customise promises a choice it does not offer",
+    "with nothing to arbitrate, a second panel adds a step without a decision",
   );
-  assert.ok(
-    labels.includes("What this covers"),
-    "the panel explains what is being accepted, so the way in must remain",
+  assert.equal(
+    labels.length,
+    2,
+    "the first panel stays to the two decisions; what it covers is in the policy",
   );
 });
 

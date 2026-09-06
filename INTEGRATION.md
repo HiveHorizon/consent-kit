@@ -9,7 +9,7 @@ Repo: `github:HiveHorizon/consent-kit`
 ## 1. Install
 
 ```sh
-pnpm add github:HiveHorizon/consent-kit#v1.2.3
+pnpm add github:HiveHorizon/consent-kit#v1.2.4
 ```
 
 Pin a tag (`#v1.0.0`) so an update to the kit can never change a site's behaviour
@@ -245,10 +245,12 @@ consent was given against a description that has now changed.
 | `appRoot` | `"#app"` | Element masked under profile `"app"`. |
 | `ui` | banner | `false` to drive the UI yourself. |
 
-The banner adapts to what you declare. With two or more categories the second
-link reads "Customise", because there is something to arbitrate. With a single
-category it reads "What this covers": the panel then explains what is being
-accepted rather than offering a choice the two buttons already make.
+The banner adapts to what you declare. With two or more categories it offers a
+"Customise" link, because there is something to arbitrate. With a single
+category the first panel stays to refuse and accept — what the choice covers
+belongs in the privacy policy linked below the buttons, not behind an extra
+step. The footer link still opens the panel, which is where the current state
+is visible.
 | `locale` | `<html lang>`, then browser | `"fr"` or `"en"`. |
 | `onChange` | — | Called on every resolved consent state. |
 | `debug` | `false` | Logs decisions to the console. |

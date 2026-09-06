@@ -134,11 +134,12 @@ export function createBanner(
     // Secondary row, so the collapsed card stays compact: the two decisions keep
     // the button row to themselves.
     const foot = el("div", "ck-foot");
-    // With one category the panel arbitrates nothing — but it is still the only
-    // place saying what is being accepted, which is the reason to open it. So
-    // the link stays and is named after what it does.
-    if (!expanded && rows.length > 0) {
-      const more = el("button", "ck-link", rows.length > 1 ? t.customise : t.details);
+    // Offered only when there is something to arbitrate. With one category the
+    // two buttons already express the whole choice, and what it covers is
+    // explained in the privacy policy linked just below — so a second panel
+    // would add a step without adding a decision.
+    if (!expanded && rows.length > 1) {
+      const more = el("button", "ck-link", t.customise);
       more.type = "button";
       more.addEventListener("click", () => {
         expanded = true;

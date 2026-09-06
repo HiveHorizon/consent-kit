@@ -51,8 +51,6 @@ export interface BannerText {
     acceptAll: string;
     refuseAll: string;
     customise: string;
-    /** Used instead of `customise` when there is nothing to arbitrate. */
-    details: string;
     save: string;
     privacyLink: string;
     analyticsTitle: string;
